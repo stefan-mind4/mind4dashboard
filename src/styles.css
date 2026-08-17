@@ -140,6 +140,125 @@ input[type='checkbox'] {
   white-space: nowrap;
 }
 
+.hdr-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1e293b;
+  border-radius: 999px;
+  padding: 4px 5px 4px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.hdr-user__mail {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: #cbd5e1;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hdr-user__out {
+  background: #334155;
+  border: none;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #e2e8f0;
+  cursor: pointer;
+}
+
+.hdr-user__out:hover {
+  background: #475569;
+  color: #fff;
+}
+
+/* ---------- Login ---------- */
+
+.login {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px 80px;
+}
+
+.login__card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 26px 28px 24px;
+  width: 100%;
+  max-width: 396px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+.login__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.login__title {
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.01em;
+}
+
+.login__sub {
+  font-size: 12px;
+  color: var(--muted-light);
+  margin-top: 1px;
+}
+
+.login__body {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #374151;
+  margin: 18px 0 0;
+}
+
+.login__error {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #b91c1c;
+  background: #fef1f1;
+  border-left: 3px solid #dc2626;
+  border-radius: 8px;
+  padding: 10px 13px;
+  margin-top: 16px;
+}
+
+.login__btn {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--border-input);
+  border-radius: 9px;
+  padding: 11px 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1f2937;
+  cursor: pointer;
+}
+
+.login__btn:hover:not(:disabled) {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.login__btn:disabled {
+  cursor: default;
+  color: var(--muted-light);
+}
+
 /* ---------- Seitenrahmen ---------- */
 
 .page {

@@ -16,7 +16,13 @@ if (!url || !anonKey) {
 }
 
 export const supabase = createClient(url, anonKey, {
-  auth: { persistSession: false },
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    // Verarbeitet den OAuth-Callback (#access_token=…) nach dem Google-Redirect.
+    detectSessionInUrl: true,
+    flowType: 'pkce',
+  },
 });
 
 export async function getReports(): Promise<ReportRow[]> {

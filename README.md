@@ -12,6 +12,31 @@ Die Pipeline liest dieses Feedback vor dem nächsten Run.
 React 18 · TypeScript · Vite · `@supabase/supabase-js` · reines CSS (keine UI-Library).
 Navigation ist clientseitig, ohne Router.
 
+## Zugriff
+
+Nur Google-Konten auf `@mind4.at`. Die Prüfung liegt auf zwei Ebenen:
+
+| Ebene | Wo | Wirkung |
+|---|---|---|
+| Client | [useAuth.ts](src/hooks/useAuth.ts) | Login-Screen; Sessions fremder Domains werden sofort beendet. Komfort — Client-Code ist manipulierbar. |
+| Postgres RLS | [supabase/rls.sql](supabase/rls.sql) | `is_mind4_user()` prüft Provider **und** Domain aus dem JWT. Der verbindliche Riegel. |
+
+Ohne Session stellt das Frontend keinen einzigen Request an Supabase — der Datenlayer
+mountet erst nach erfolgreichem Login.
+
+### Einrichtung (einmalig, in den Consoles)
+
+1. **Google Cloud Console** → OAuth-2.0-Client-ID (Typ „Web application") anlegen.
+   Authorized redirect URI: `https://<project-ref>.supabase.co/auth/v1/callback`
+2. **Supabase** → Authentication → Providers → Google aktivieren, Client ID und Secret eintragen.
+3. **Supabase** → Authentication → URL Configuration: Site URL auf die Netlify-Domain,
+   `http://localhost:5173` als zusätzliche Redirect-URL für die lokale Entwicklung.
+4. **Supabase** → Authentication → Providers → Email **deaktivieren**. Sonst könnte sich jemand
+   selbst mit einer erfundenen `@mind4.at`-Adresse registrieren. `is_mind4_user()` fängt das über
+   die Provider-Prüfung ab, aber zwei Riegel sind besser als einer.
+5. `supabase/rls.sql` im SQL Editor ausführen — **erst nachdem** die Pipeline auf den
+   `service_role`-Key umgestellt ist, siehe Kommentarkopf im Skript.
+
 ## Setup
 
 ```bash
@@ -95,13 +120,12 @@ Bewusste Entscheidungen beim Nachbau — die Optik ist unverändert:
 
 ## Offene Punkte
 
-1. **Google-Login — dringend.** Supabase Auth mit Google-Provider, Login-Screen vor dem Cockpit,
-   RLS von `using (true)` auf `authenticated` umstellen, optional Domain-Restriktion
-   `auth.jwt()->>'email' like '%@mind4.at'`. Solange die anon-Policies offen stehen, kann jeder
-   mit URL und anon-Key alle Kundendaten lesen **und schreiben**.
-2. **RLS vervollständigen** — `reports` fehlen update/delete-Policies; nach der Auth-Umstellung
-   ohnehin das komplette Policy-Set neu.
-3. **Pipeline auf `service_role` umstellen** (nur serverseitig) nach der Auth-Umstellung.
+1. **Consoles einrichten** — die fünf Schritte unter „Zugriff“. Bis der Google-Provider steht,
+   kommt niemand über den Login-Screen hinaus, auch lokal nicht.
+2. **Pipeline auf `service_role` umstellen** (nur serverseitig) — muss vor `rls.sql` passieren,
+   sonst schreibt die Pipeline nicht mehr.
+3. **`rls.sql` ausführen.** Bis dahin stehen die anon-Policies offen: wer URL und anon-Key aus dem
+   Bundle liest, kann alle Kundendaten lesen **und schreiben**. Der Login allein verhindert das nicht.
 4. **URL-Routing** ergänzen, damit Client-Ansichten verlinkbar sind.
 
 Verifiziert: Lesepfade und der Feedback-Schreibpfad (Checkbox → Upsert in `feedback`) gegen das

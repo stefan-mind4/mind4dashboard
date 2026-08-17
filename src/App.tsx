@@ -1,11 +1,39 @@
 import { useState } from 'react';
 import ClientDetail from './components/ClientDetail';
 import Header from './components/Header';
+import Login from './components/Login';
 import Overview from './components/Overview';
 import { computeTotals } from './lib/derive';
 import { useCockpit } from './hooks/useCockpit';
+import { useAuth } from './hooks/useAuth';
+import type { Auth } from './hooks/useAuth';
 
 export default function App() {
+  const auth = useAuth();
+
+  if (auth.status === 'loading') {
+    return (
+      <div className="app">
+        <Header critCount={0} openTotal={0} sync="connecting" showStats={false} />
+        <div className="loading">Checking session …</div>
+      </div>
+    );
+  }
+
+  if (auth.status === 'signed-out') {
+    return (
+      <div className="app">
+        <Header critCount={0} openTotal={0} sync="connecting" showStats={false} />
+        <Login error={auth.error} onSignIn={auth.signIn} />
+      </div>
+    );
+  }
+
+  // Erst ab hier laedt useCockpit — ohne Session gibt es keine Daten zu holen.
+  return <Cockpit auth={auth} />;
+}
+
+function Cockpit({ auth }: { auth: Auth }) {
   const cockpit = useCockpit();
   const [clientId, setClientId] = useState<string | null>(null);
 
@@ -19,7 +47,13 @@ export default function App() {
 
   return (
     <div className="app">
-      <Header critCount={totals.critCount} openTotal={totals.openTotal} sync={sync} />
+      <Header
+        critCount={totals.critCount}
+        openTotal={totals.openTotal}
+        sync={sync}
+        email={auth.email}
+        onSignOut={auth.signOut}
+      />
 
       {loading ? (
         <div className="loading">Loading reports …</div>
