@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+.vite/
+*.tsbuildinfo
+
+# Design-Handoff von Claude Design — bleibt lokal.
+# Enthaelt echte Kundendaten (data.js) und den anon-Key im Klartext
+# (supabase.js, google-ads-daily-alarm.md); dieses Repo ist oeffentlich.
+design-handoff/
+
