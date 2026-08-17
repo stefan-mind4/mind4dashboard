@@ -80,9 +80,9 @@ export function useAuth(): Auth {
       options: {
         redirectTo: window.location.origin,
         queryParams: {
-          // Beschraenkt die Konto-Auswahl bei Google auf die Domain.
-          // Reiner UI-Hinweis, keine Absicherung — deshalb pruefen wir zusaetzlich.
-          hd: ALLOWED_DOMAIN,
+          // Kein `hd`-Parameter: der filtert auf Workspace-gehostete Domains.
+          // mind4 ist kein Workspace-Kunde, die @mind4.at-Konten sind private
+          // Google-Accounts ohne hd-Claim — mit `hd` waeren sie ausgeschlossen.
           prompt: 'select_account',
         },
       },

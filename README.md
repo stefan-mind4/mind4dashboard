@@ -26,8 +26,13 @@ mountet erst nach erfolgreichem Login.
 
 ### Einrichtung (einmalig, in den Consoles)
 
-1. **Google Cloud Console** → OAuth-2.0-Client-ID (Typ „Web application") anlegen.
-   Authorized redirect URI: `https://<project-ref>.supabase.co/auth/v1/callback`
+1. **Google Cloud Console**, eigenes Projekt (`mind4cockpit`, getrennt vom Google-Ads-MCP-Projekt,
+   weil die Zielgruppen-Einstellung projektweit gilt):
+   Zielgruppe **Extern** — mind4 ist kein Google-Workspace-Kunde, „Intern" ist deshalb nicht
+   verfügbar. Publishing-Status auf **Testing** und die berechtigten Konten als Testnutzer
+   eintragen; das ist eine explizite Allowlist auf Google-Ebene.
+   OAuth-Client Typ „Webanwendung", Redirect-URI
+   `https://<project-ref>.supabase.co/auth/v1/callback`
 2. **Supabase** → Authentication → Providers → Google aktivieren, Client ID und Secret eintragen.
 3. **Supabase** → Authentication → URL Configuration: Site URL auf die Netlify-Domain,
    `http://localhost:5173` als zusätzliche Redirect-URL für die lokale Entwicklung.
@@ -36,6 +41,12 @@ mountet erst nach erfolgreichem Login.
    die Provider-Prüfung ab, aber zwei Riegel sind besser als einer.
 5. `supabase/rls.sql` im SQL Editor ausführen — **erst nachdem** die Pipeline auf den
    `service_role`-Key umgestellt ist, siehe Kommentarkopf im Skript.
+
+Kein `hd`-Parameter im OAuth-Aufruf: der filtert auf Workspace-gehostete Domains und würde die
+privaten Google-Accounts mit `@mind4.at`-Adresse ausschließen.
+
+Ohne Workspace-Directory hängt die Domain-Prüfung daran, wer Mail auf `@mind4.at` empfangen kann —
+das ist der Grund für die Testnutzer-Allowlist als zusätzliche Ebene.
 
 ## Setup
 
