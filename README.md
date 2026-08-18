@@ -125,19 +125,30 @@ Bewusste Entscheidungen beim Nachbau — die Optik ist unverändert:
 
 ## Deploy (Netlify)
 
+Produktion: **https://cockpit.mind4.at** — Netlify baut bei jedem Push auf `main` neu.
+
 `netlify.toml` ist eingerichtet: Build `npm run build`, Publish `dist`, SPA-Rewrite auf
 `index.html`, `noindex`-Header. In den Netlify-Site-Settings müssen
-`VITE_SUPABASE_URL` und `VITE_SUPABASE_ANON_KEY` als Environment-Variablen gesetzt werden.
+`VITE_SUPABASE_URL` und `VITE_SUPABASE_ANON_KEY` als Environment-Variablen gesetzt sein —
+Vite inlined sie zur Buildzeit, ohne sie baut die Site zwar, zeigt aber eine leere Seite.
+
+Bei neuen Domains gehört die URL zusätzlich in Supabase unter Authentication →
+URL Configuration (Site URL ohne Wildcard, Redirect URL mit `/**`). Die Site URL muss eine
+blanke URL sein — ein versehentlich mitkopiertes Label führt zu
+`invalid control character in URL` und einem 500er am OAuth-Callback.
 
 ## Offene Punkte
 
-1. **Consoles einrichten** — die fünf Schritte unter „Zugriff“. Bis der Google-Provider steht,
-   kommt niemand über den Login-Screen hinaus, auch lokal nicht.
-2. **Pipeline auf `service_role` umstellen** (nur serverseitig) — muss vor `rls.sql` passieren,
-   sonst schreibt die Pipeline nicht mehr.
-3. **`rls.sql` ausführen.** Bis dahin stehen die anon-Policies offen: wer URL und anon-Key aus dem
-   Bundle liest, kann alle Kundendaten lesen **und schreiben**. Der Login allein verhindert das nicht.
-4. **URL-Routing** ergänzen, damit Client-Ansichten verlinkbar sind.
+Setup abgeschlossen: Google-Provider, Login, RLS und die Pipeline auf `service_role` laufen
+in Produktion. Verifiziert wurde, dass `anon` auf allen vier Tabellen bei Lesen **und** Schreiben
+401 bekommt und die Seite ohne Session keinen einzigen Request an Supabase stellt.
 
-Verifiziert: Lesepfade und der Feedback-Schreibpfad (Checkbox → Upsert in `feedback`) gegen das
-Live-Backend. Noch nicht praktisch getestet: Notiz, Client-Description, Adjustment, Add-Client.
+1. **Pipeline-Praxistest** — die Supabase-Mechanik (Keychain-Lesen, Kundenabfrage, Upsert mit
+   `service_role`) ist geprüft, ein vollständiger Lauf inkl. Google-Ads-Teil steht noch aus.
+2. **Schreibpfade im UI** — Checkbox → `feedback` ist gegen das Live-Backend getestet.
+   Notiz, Client-Description, Adjustment und Add-Client sind implementiert, aber noch nicht
+   praktisch ausgelöst.
+3. **Domain-Prüfung in `useAuth`** ist unbewiesen: ein Login mit fremder Domain wird schon von
+   Googles Testnutzer-Allowlist geblockt. Relevant, sobald der Publishing-Status auf
+   „Production" wechselt — dann gezielt prüfen.
+4. **URL-Routing** ergänzen, damit Client-Ansichten verlinkbar sind.
